@@ -1,4 +1,4 @@
-package simulation.general;
+package simulation;
 
 /**
  * Tuple usable as neuron location

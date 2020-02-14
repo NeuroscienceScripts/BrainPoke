@@ -1,38 +1,21 @@
 package simulation;
 
-import simulation.general.Location;
+import java.util.ArrayList;
+import java.util.List;
+
 import static simulation.general.General.*;
 
 public class Neuron {
-    /**
-     * Recovery time constant
-     */
+
     double a = 0;
-
-    /**
-     * constant 1/R
-     */
     double b = 0;
-
-    /**
-     * Potential reset value
-     */
     double c = 0;
-
-    /**
-     * Outward minus inward current
-     */
     double d = 0;
-
-    /**
-     * Current voltage
-     */
     double v = 0;
-
-    /**
-     * Neuron's location in a 3d system
-     */
+    double u = 0;
+    double vThreshold = 30;
     Location location = new Location(0,0,0);
+    List<Synapse> synapses = new ArrayList<Synapse>();
 
     /**
      * Declares the possible pre-built neurons
@@ -59,15 +42,21 @@ public class Neuron {
            case RS:
                this.a = .02;
                this.b = .2;
-               this.c = -65.0;
-               this.d = 8.0;
+               this.c = -65;
+               this.v = -65;
+               this.d = 8;
+               this.u = .2 * -65;
+               this.vThreshold = 30;
                this.location = location;
 
            case FS:
                this.a = .01;
                this.b = .2;
-               this.c = -65.0;
+               this.c = -65;
+               this.v = -65;
                this.d = 2.0;
+               this.u = .2 * -65;
+               this.vThreshold = 30;
                this.location = location;
 
            default:
@@ -82,14 +71,58 @@ public class Neuron {
 
     /**
      * Typical creation of a Neuron
-     * @param
+     * @param a = recovery time constant (ms^-1) - smaller values result in slower recovery
+     * @param b = sensitivity of recovery variable "u" - 1/R  (pA.mV^-1 [10^-9 Ω^-1])
+     * @param c = post spike reset value/starting voltage (mV)
+     * @param d = outward - inward current (pA)
+     * @param vThreshold = voltage to cutoff spike (mV)
      */
-     public Neuron(double a, double b, double c, double d, Location location){
+     public Neuron(double a, double b, double c, double d, double vThreshold,  Location location){
          this.a = a;
          this.b = b;
          this.c = c;
+         this.v = c;
          this.d = d;
+         this.u = b*v;
+         this.vThreshold = vThreshold;
          this.location = location;
+     }
+
+    /**
+     * Adds a pre-synaptic connection to the specified postsynaptic neuron
+     * @param postsynaptic = Synapse containing the postsynaptic neuron
+     */
+    public void addSynapse(Synapse postsynaptic){
+         this.synapses.add(postsynaptic);
+     }
+
+    /**
+     * Updates voltage based off Izhikevich model parameters.
+     * Presynaptic neurons will have already fired and applied
+     * their voltage changes to this Neuron...
+     * Checks if this Neuron should fire. If so,
+     * iterates through all synapses in which this Neuron is
+     * the pre-synaptic neuron and calls Neuron.changeVoltage
+     */
+    public void update(){
+        v = v + .5*(.04*(v*v)+5*v+140-u);
+        v = v + .5*(.04*(v*v)+5*v+140-u); // break voltage change into two steps for better approximation
+        u = u + (a*b*v - a*u);
+        if(this.v > this.vThreshold) {
+            for (Synapse syn : synapses) {
+                syn.postsynapticNeuron.changeVoltage(syn.excitatory ? syn.weight : -syn.weight);
+            }
+            println("Spike!");
+        }
+     }
+
+    /**
+     * Updates the Neuron voltage
+     * @param voltageChange = signed (+/-) voltage change to apply to the Neuron
+     */
+    public void changeVoltage(double voltageChange){
+        this.v = this.v + voltageChange;
+        println("Voltage change: "+voltageChange);
      }
 
 }
