@@ -48,6 +48,7 @@ public class Neuron {
                this.u = .2 * -65;
                this.vThreshold = 30;
                this.location = location;
+               break;
 
            case FS:
                this.a = .01;
@@ -58,6 +59,7 @@ public class Neuron {
                this.u = .2 * -65;
                this.vThreshold = 30;
                this.location = location;
+               break;
 
            default:
                println("ERROR - Predefined Neuron not found");
@@ -66,6 +68,7 @@ public class Neuron {
                this.c = 0;
                this.d = 0;
                this.location = location;
+               break;
        }
     }
 
@@ -108,10 +111,14 @@ public class Neuron {
         v = v + .5*(.04*(v*v)+5*v+140-u);
         v = v + .5*(.04*(v*v)+5*v+140-u); // break voltage change into two steps for better approximation
         u = u + (a*b*v - a*u);
+        println("Voltage: "+this.v);
         if(this.v > this.vThreshold) {
             for (Synapse syn : synapses) {
                 syn.postsynapticNeuron.changeVoltage(syn.excitatory ? syn.weight : -syn.weight);
             }
+            println("Change v to c: "+this.c);
+            v = c;
+            u = u + d;
             println("Spike!");
         }
      }
@@ -123,6 +130,14 @@ public class Neuron {
     public void changeVoltage(double voltageChange){
         this.v = this.v + voltageChange;
         println("Voltage change: "+voltageChange);
+     }
+
+    /**
+     * Used to get the Neuron's current voltage (for plotting purposes)
+     * @return this.v (Neuron's current voltage)
+     */
+    public double getVoltage(){
+        return this.v;
      }
 
 }
