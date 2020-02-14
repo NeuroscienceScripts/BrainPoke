@@ -27,7 +27,7 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import static simulation.general.General.print;
+import static simulation.general.General.println;
 
 public class OptionPane {
     private boolean optionPaneOpen; //True if script is busy handling option pane
@@ -136,11 +136,11 @@ public class OptionPane {
         timer.start();
         String input = JOptionPane.showInputDialog(frame,message,scriptName,0);
         if(input==null) {
-            print("Default option: "+defaultReturn);
+            println("Default option: "+defaultReturn);
             timer.stop();
             return defaultReturn;
         }
-        print("Input received: "+input);
+        println("Input received: "+input);
         timer.stop();
         return input;
     }
@@ -199,7 +199,7 @@ public class OptionPane {
             return n;
         }
         else {
-            print("Default option: "+defaultReturn);
+            println("Default option: "+defaultReturn);
             timer.stop();
             return defaultReturn;
         }
@@ -254,7 +254,7 @@ public class OptionPane {
                 "ScriptsForMains: "+scriptName,
                 JOptionPane.YES_NO_OPTION);
         if(n==-1){
-            print("Default option: "+defaultReturn);
+            println("Default option: "+defaultReturn);
             if(frame.isActive())
                 frame.dispose();
             optionPaneOpen =false;
