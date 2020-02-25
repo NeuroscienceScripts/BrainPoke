@@ -14,5 +14,7 @@ public class Main {
             singleNeuron.update();
             singleNeuronVoltages[t] = singleNeuron.getVoltage();
         }
+
+
     }
 }
