@@ -9,7 +9,7 @@ import static simulation.general.General.println;
 
 public class Main {
     public static void main(String[] args) {
-        int timeSteps = 1000;
+        int timeSteps = 200;
         int numberNeurons = 3;
 
         Neuron[] neurons = new Neuron[numberNeurons];
@@ -25,7 +25,7 @@ public class Main {
 
         List<Synapse> synapses = new ArrayList<Synapse>();
         for (int t = 0; t < timeSteps; t++) {
-            neurons[0].changeVoltage(5);
+            //neurons[0].changeVoltage(5);
             for(int i=0; i<numberNeurons; i++){
                 if(neurons[i].update()){
                     synapses = neurons[i].getSynapses();
@@ -40,7 +40,7 @@ public class Main {
         }
 
         for (int t=0; t<timeSteps; t++){
-            println(t + ": " + singleNeuronVoltages[t]+ " volts");
+            println(Double.toString(singleNeuronVoltages[t]));
         }
         //TODO: Figure out how to plot the array "singleNeuronVoltages"
         //The array contains the voltage at each timestep.  The above For loop prints out the values
