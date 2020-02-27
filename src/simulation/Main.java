@@ -2,19 +2,41 @@ package simulation;
 
 import org.jfree.chart.ChartFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static simulation.general.General.println;
 
 public class Main {
     public static void main(String[] args) {
         int timeSteps = 1000;
-        Neuron singleNeuron = new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0));
+        int numberNeurons = 3;
+
+        Neuron[] neurons = new Neuron[numberNeurons];
+        neurons[0] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
+        neurons[1] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
+        neurons[2] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
 
         double[] singleNeuronVoltages = new double[timeSteps];
 
+        neurons[0].addSynapse(new Synapse(1,true,20));
+        neurons[1].addSynapse(new Synapse(2,true,20));
+
+
+        List<Synapse> synapses = new ArrayList<Synapse>();
         for (int t = 0; t < timeSteps; t++) {
-            singleNeuron.changeVoltage(5);
-            singleNeuron.update();
-            singleNeuronVoltages[t] = singleNeuron.getVoltage();
+            neurons[0].changeVoltage(5);
+            for(int i=0; i<numberNeurons; i++){
+                if(neurons[i].update()){
+                    synapses = neurons[i].getSynapses();
+                    for(Synapse syn : synapses){
+                        neurons[syn.neuronID].changeVoltage(syn.getWeight());
+                    }
+                }
+
+            }
+            singleNeuronVoltages[t] = neurons[2].getVoltage();
+            println("***");
         }
 
         for (int t=0; t<timeSteps; t++){

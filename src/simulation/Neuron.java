@@ -15,7 +15,7 @@ public class Neuron {
     double u = 0;
     double vThreshold = 30;
     Location location = new Location(0,0,0);
-    List<Synapse> synapses = new ArrayList<Synapse>();
+    List<Synapse> synapses = new ArrayList<>();
 
     /**
      * Declares the possible pre-built neurons
@@ -92,11 +92,10 @@ public class Neuron {
      }
 
     /**
-     * Adds a pre-synaptic connection to the specified postsynaptic neuron
-     * @param postsynaptic = Synapse containing the postsynaptic neuron
+     * Neuron ID must be handled by the main script.  Takes
      */
-    public void addSynapse(Synapse postsynaptic){
-         this.synapses.add(postsynaptic);
+    public void addSynapse(Synapse newSynapse){
+         this.synapses.add(newSynapse);
      }
 
     /**
@@ -107,20 +106,21 @@ public class Neuron {
      * iterates through all synapses in which this Neuron is
      * the pre-synaptic neuron and calls Neuron.changeVoltage
      */
-    public void update(){
+    public boolean update(){
+        boolean spike = false;
         v = v + .5*(.04*(v*v)+5*v+140-u);
         v = v + .5*(.04*(v*v)+5*v+140-u); // break voltage change into two steps for better approximation
         u = u + (a*b*v - a*u);
         println("Voltage: "+this.v);
         if(this.v > this.vThreshold) {
-            for (Synapse syn : synapses) {
-                syn.postsynapticNeuron.changeVoltage(syn.excitatory ? syn.weight : -syn.weight);
-            }
+           spike = true;
+
             println("Change v to c: "+this.c);
             v = c;
             u = u + d;
             println("Spike!");
         }
+        return spike;
      }
 
     /**
@@ -138,6 +138,17 @@ public class Neuron {
      */
     public double getVoltage(){
         return this.v;
+     }
+
+    /**
+     * Used to get the Neuron's location Z value
+     */
+    public int getZ(){
+        return this.location.z;
+     }
+
+     public List<Synapse> getSynapses(){
+        return this.synapses;
      }
 
 }
