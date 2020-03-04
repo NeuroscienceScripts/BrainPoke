@@ -9,7 +9,7 @@ public class Synapse {
      * Each Neuron has a list of post-synaptic connections which are iterated through in Neuron.update()
      * @param neuronID = postsynaptic neuron to call Neuron.changeVoltage (ID handled by main program)
      * @param excitatory = declare whether synapse is excitatory (true) or inhibitory (false)
-     * @param weight = synapse strength
+     * @param weight = synapse strength, voltage change in postsynaptic potential
      */
     public Synapse(int neuronID, boolean excitatory, double weight){
         this.neuronID = neuronID;

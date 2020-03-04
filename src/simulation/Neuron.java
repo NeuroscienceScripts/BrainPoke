@@ -7,6 +7,7 @@ import static simulation.general.General.*;
 
 public class Neuron {
 
+    int hz = 10;
     double a = 0;
     double b = 0;
     double c = 0;
@@ -14,6 +15,8 @@ public class Neuron {
     double v = 0;
     double u = 0;
     double vThreshold = 30;
+    double probabilityOfSynapseHorizontal = 0;
+    double probabilityOfSynapseVertical = 0;
     Location location = new Location(0,0,0);
     List<Synapse> synapses = new ArrayList<>();
 
@@ -35,41 +38,41 @@ public class Neuron {
     /**
      * Creates an instance of the neuron with the following prebuilt settings
      * @param pbn
+     * @param location
      */
     public Neuron(PrebuiltNeuron pbn, Location location){
         //TODO find the parameters for the prebuilt neurons specified in PrebuiltNeuron
-       switch (pbn) {
-           case RS:
-               this.a = .02;
-               this.b = .2;
-               this.c = -65;
-               this.v = -65;
-               this.d = 8;
-               this.u = .2 * -65;
-               this.vThreshold = 30;
-               this.location = location;
-               break;
+        switch (pbn) {
+            case RS:
+                this.a = .02;
+                this.b = .2;
+                this.c = -65;
+                this.v = -70;
+                this.d = 8;
+                this.u = .2 * -65;
+                this.vThreshold = 30;
+                this.probabilityOfSynapseHorizontal = 5;
+                this.probabilityOfSynapseVertical = 5;
+                this.location = location;
+                break;
 
-           case FS:
-               this.a = .01;
-               this.b = .2;
-               this.c = -65;
-               this.v = -65;
-               this.d = 2.0;
-               this.u = .2 * -65;
-               this.vThreshold = 30;
-               this.location = location;
-               break;
+            case FS:
+                this.a = .01;
+                this.b = .2;
+                this.c = -65;
+                this.v = -70;
+                this.d = 2.0;
+                this.u = .2 * -65;
+                this.vThreshold = 30;
+                this.probabilityOfSynapseHorizontal = 5;
+                this.probabilityOfSynapseVertical = 5;
+                this.location = location;
+                break;
 
-           default:
-               println("ERROR - Predefined Neuron not found");
-               this.a = 0;
-               this.b = 0;
-               this.c = 0;
-               this.d = 0;
-               this.location = location;
-               break;
-       }
+            default:
+                println("ERROR - Predefined Neuron not found");
+                break;
+        }
     }
 
     /**
@@ -80,7 +83,7 @@ public class Neuron {
      * @param d = outward - inward current (pA)
      * @param vThreshold = voltage to cutoff spike (mV)
      */
-     public Neuron(double a, double b, double c, double d, double vThreshold,  Location location){
+     public Neuron(double a, double b, double c, double d, double vThreshold, double probabilityOfSynapseHorizontal, double probabilityOfSynapseVertical,  Location location){
          this.a = a;
          this.b = b;
          this.c = c;
@@ -88,6 +91,8 @@ public class Neuron {
          this.d = d;
          this.u = b*v;
          this.vThreshold = vThreshold;
+         this.probabilityOfSynapseVertical = probabilityOfSynapseVertical;
+         this.probabilityOfSynapseHorizontal = probabilityOfSynapseHorizontal;
          this.location = location;
      }
 
@@ -108,8 +113,7 @@ public class Neuron {
      */
     public boolean update(){
         boolean spike = false;
-        v = v + .5*(.04*(v*v)+5*v+140-u);
-        v = v + .5*(.04*(v*v)+5*v+140-u); // break voltage change into two steps for better approximation
+        v = v + (1/hz)*(.04*(v*v)+5*v+140-u);
         u = u + (a*b*v - a*u);
         println("Voltage: "+this.v);
         if(this.v > this.vThreshold) {
@@ -143,7 +147,7 @@ public class Neuron {
     /**
      * Used to get the Neuron's location Z value
      */
-    public int getZ(){
+    public double getZ(){
         return this.location.z;
      }
 

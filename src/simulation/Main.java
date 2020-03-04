@@ -5,14 +5,54 @@ import org.jfree.chart.ChartFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import simulation.NetworkNeuron;
+import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.println;
 
 public class Main {
     public static void main(String[] args) {
         int timeSteps = 200;
-        int numberNeurons = 3;
 
-        Neuron[] neurons = new Neuron[numberNeurons];
+        int numberLayers = 3;
+        int layerSizeX = 100;
+        int layerSizeY = 100;
+        int[] neuronsPerLayerArray = new int[numberLayers];
+        for(int i=0; i<numberLayers; i++){
+            neuronsPerLayerArray[i] = 1000; //TODO Update to be biologically relevant for neuron density at each layer
+        }
+        List<NetworkNeuron>[] typesOfNeuronsPerLayerArray = new List[numberLayers];
+        List<Double>[] percentOfNeuronsPerLayerArray = new List[numberLayers];
+
+        for(int i=0; i<numberLayers; i++){
+            typesOfNeuronsPerLayerArray[i] = new ArrayList<>();
+            percentOfNeuronsPerLayerArray[i] = new ArrayList<>();
+        }
+
+        //TODO Update for variable amounts of layers
+        // *** Update for different neuron types in layers ***
+        // *** Layer 1 ***
+        typesOfNeuronsPerLayerArray[0].add(new NetworkNeuron(RS, 0.0, 0.0)); // adds a new neuron type to the layer (in this case RS = regular spiking)
+        percentOfNeuronsPerLayerArray[0].add(.85); // adds the percentage of regular spiking neurons declared in the line above
+        typesOfNeuronsPerLayerArray[0].add(new NetworkNeuron(FS, 0.0, 0.0));
+        percentOfNeuronsPerLayerArray[0].add(.15);
+
+        // *** Layer 2 ***
+        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(RS, 0.0, 0.0));
+        percentOfNeuronsPerLayerArray[1].add(.85);
+        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(FS, 0.0, 0.0));
+        percentOfNeuronsPerLayerArray[1].add(.15);
+
+        // *** Layer 3 ***
+        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(RS, 0.0, 0.0));
+        percentOfNeuronsPerLayerArray[2].add(.85);
+        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(FS, 0.0, 0.0));
+        percentOfNeuronsPerLayerArray[2].add(.15);
+
+
+        Network newNetwork = new Network(numberLayers, layerSizeX, layerSizeY, neuronsPerLayerArray, typesOfNeuronsPerLayerArray, percentOfNeuronsPerLayerArray);
+
+
+        /*Neuron[] neurons = new Neuron[numberNeurons];
         neurons[0] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
         neurons[1] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
         neurons[2] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
@@ -20,28 +60,8 @@ public class Main {
         double[] singleNeuronVoltages = new double[timeSteps];
 
         neurons[0].addSynapse(new Synapse(1,true,20));
-        neurons[1].addSynapse(new Synapse(2,true,20));
+        neurons[1].addSynapse(new Synapse(2,true,20));*/
 
-
-        List<Synapse> synapses = new ArrayList<Synapse>();
-        for (int t = 0; t < timeSteps; t++) {
-            //neurons[0].changeVoltage(5);
-            for(int i=0; i<numberNeurons; i++){
-                if(neurons[i].update()){
-                    synapses = neurons[i].getSynapses();
-                    for(Synapse syn : synapses){
-                        neurons[syn.neuronID].changeVoltage(syn.getWeight());
-                    }
-                }
-
-            }
-            singleNeuronVoltages[t] = neurons[2].getVoltage();
-            println("***");
-        }
-
-        for (int t=0; t<timeSteps; t++){
-            println(Double.toString(singleNeuronVoltages[t]));
-        }
         //TODO: Figure out how to plot the array "singleNeuronVoltages"
         //The array contains the voltage at each timestep.  The above For loop prints out the values
         //at each (for comparison with the graph output).  Java requires an "instance" of each class
