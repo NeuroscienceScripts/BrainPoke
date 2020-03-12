@@ -10,13 +10,16 @@ import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.*;
 
 public class Main {
-    static Neuron[] neuronArray;
-    static int timeSteps = 200;
-    static int numberLayers = 3;
-    static int layerSizeX = 10;
-    static int layerSizeY = 10;
+    static final int timeSteps = 200;
+    static final int numberLayers = 3;
+    static final int layerSizeX = 10;
+    static final int layerSizeY = 10;
+    static final int numberTargetCells = 100000;
+
     static int[] neuronsPerLayerArray = new int[numberLayers];
     static ArrayList<Electrode> electrodeArray = new ArrayList<>();
+    static int[] targetLayerSpikes = new int[numberTargetCells];
+    static Neuron[] neuronArray;
 
     public static void main(String[] args) {
         createNetwork();
@@ -27,7 +30,7 @@ public class Main {
 
     public static void createNetwork(){
         for(int i=0; i<numberLayers; i++){
-            neuronsPerLayerArray[i] = 100000; //TODO Update to be biologically relevant for neuron density at each layer
+            neuronsPerLayerArray[i] = numberTargetCells; //TODO Update to be biologically relevant for neuron density at each layer
         }
         List<NetworkNeuron>[] typesOfNeuronsPerLayerArray = new List[numberLayers];
         List<Double>[] percentOfNeuronsPerLayerArray = new List[numberLayers];
@@ -72,27 +75,41 @@ public class Main {
     }
 
     public static void runSimulation(){
-        for(int i = 0; i<1; i++) {
+        for(int i = 0; i<timeSteps; i++) {
 
             int count = 0;
             for(Electrode electrode: electrodeArray) {
                 if (timeSteps % electrode.frequency == 0) {
                     for (int neuronID : electrode.neuronsInRange) {
-                        println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
+                        //println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
                         neuronArray[neuronID].changeVoltage(electrode.voltageAtNeurons.get(count));
-                        println(""+neuronArray[neuronID].getVoltage());
+                        //println(""+neuronArray[neuronID].getVoltage());
                         count++;
                     }
                 }
             }
 
+            count = 0;
             for(Neuron neuron: neuronArray){
                 if(neuron.checkForSpike()){
+                    if(count > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)
+                        targetLayerSpikes[count-(sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)]++;
                     for(Synapse synapse: neuron.getSynapses()){
                         neuronArray[synapse.neuronID].changeVoltage(synapse.getWeight());
                     }
                 }
+                count++;
             }
+
+
         }
+
+        int numberOfTargetCellsFired = 0;
+        for(int numberOfSpikes: targetLayerSpikes)
+            if(numberOfSpikes>0)
+                numberOfTargetCellsFired++;
+
+        println("Number of target layer spikes: "+ sumIntegerArray(targetLayerSpikes));
+        println("Number of different cells that have fired: "+numberOfTargetCellsFired);
     }
 }

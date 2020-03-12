@@ -72,7 +72,7 @@ public class Electrode {
                 || neuron.location.z > this.getMaxZ()
                 || neuron.location.z < this.getMinZ())
             return false;
-        println("Neuron in range");
+
         return true;
     }
 

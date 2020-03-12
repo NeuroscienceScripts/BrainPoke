@@ -19,6 +19,14 @@ public class General {
         return returnSum;
     }
 
+    public static int sumIntegerArray(int[] integerArray){
+        int returnSum=0;
+        for(int i: integerArray){
+            returnSum = returnSum + i;
+        }
+        return returnSum;
+    }
+
     public static double sumDoubleList(List<Double> doubleList){
         double returnSum=0;
         for(double i: doubleList){

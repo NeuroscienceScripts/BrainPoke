@@ -119,7 +119,7 @@ public class Neuron {
         if(this.v > this.vThreshold) {
            spike = true;
 
-            println("Change v to c: "+this.c);
+            //println("Change v to c: "+this.c);
             v = c;
             u = u + d;
             println("Spike!");
@@ -133,7 +133,7 @@ public class Neuron {
      */
     public void changeVoltage(double voltageChange){
         this.v = this.v + voltageChange;
-        println("Voltage change: "+voltageChange);
+       // println("Voltage change: "+voltageChange);
      }
 
     /**
