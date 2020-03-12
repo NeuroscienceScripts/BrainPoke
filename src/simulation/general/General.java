@@ -39,4 +39,14 @@ public class General {
         Random r = new Random();
         return mean + stdDev*r.nextGaussian();
     }
+
+    public static double randomDouble(double max){
+        Random r = new Random();
+        return r.nextDouble();
+    }
+
+    public static int randomInt(int max) {
+        Random r = new Random();
+        return r.nextInt(max);
+    }
 }

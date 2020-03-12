@@ -19,6 +19,7 @@ public class Neuron {
     double probabilityOfSynapseVertical = 0;
     Location location = new Location(0,0,0);
     List<Synapse> synapses = new ArrayList<>();
+    PrebuiltNeuron prebuiltClass;
 
     /**
      * Declares the possible pre-built neurons
@@ -28,11 +29,11 @@ public class Neuron {
         /**
          * Regular spiking
          */
-        RS,
+        EXC,
         /**
          * Fast spiking
          */
-        FS
+        INH
     }
 
     /**
@@ -43,7 +44,7 @@ public class Neuron {
     public Neuron(PrebuiltNeuron pbn, Location location){
         //TODO find the parameters for the prebuilt neurons specified in PrebuiltNeuron
         switch (pbn) {
-            case RS:
+            case EXC:
                 this.a = .02;
                 this.b = .2;
                 this.c = -65;
@@ -54,9 +55,10 @@ public class Neuron {
                 this.probabilityOfSynapseHorizontal = 5;
                 this.probabilityOfSynapseVertical = 5;
                 this.location = location;
+                this.prebuiltClass = PrebuiltNeuron.EXC;
                 break;
 
-            case FS:
+            case INH:
                 this.a = .01;
                 this.b = .2;
                 this.c = -65;
@@ -67,6 +69,7 @@ public class Neuron {
                 this.probabilityOfSynapseHorizontal = 5;
                 this.probabilityOfSynapseVertical = 5;
                 this.location = location;
+                this.prebuiltClass = PrebuiltNeuron.INH;
                 break;
 
             default:
@@ -154,5 +157,20 @@ public class Neuron {
      public List<Synapse> getSynapses(){
         return this.synapses;
      }
+
+    public double getDistance(Neuron targetNeuron){
+        double xDistance = this.location.x - targetNeuron.location.x;
+        double yDistance = this.location.y - targetNeuron.location.y;
+        double zDistance = this.location.z - targetNeuron.location.z;
+
+        return Math.pow(Math.pow(xDistance,2)+Math.pow(yDistance,2)+Math.pow(zDistance,2),.5);
+    }
+
+    public double getRadialDistance(Neuron targetNeuron){
+        double xDistance = this.location.x - targetNeuron.location.x;
+        double yDistance = this.location.y - targetNeuron.location.y;
+
+        return Math.pow(Math.pow(xDistance,2)+Math.pow(yDistance,2),.5);
+    }
 
 }
