@@ -125,7 +125,7 @@ public class Neuron {
             //println("Change v to c: "+this.c);
             v = c;
             u = u + d;
-            println("Spike!");
+            //println("Spike!");
         }
         return spike;
      }
@@ -136,7 +136,7 @@ public class Neuron {
      */
     public void changeVoltage(double voltageChange){
         this.v = this.v + voltageChange;
-       // println("Voltage change: "+voltageChange);
+       //println("Voltage change: "+voltageChange);
      }
 
     /**

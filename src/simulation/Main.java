@@ -15,19 +15,19 @@ public class Main {
     //  *** ELECTRODE VARIABLES TO CHANGE ***
     static final double electrodeX = 1;
     static final double electrodeY = 1;
-    static final double electrodeZ = 0;
+    static final double electrodeZ = 1;
     static final double electrodeRadius = .1;
     static final double electrodeFrequency = 1;
-    static final double electrodeCurrent = 10;
+    static final double electrodeCurrent = 500;
     static final double electrodeTimeOffset = 0;
 
     static final int timeSteps = 200;
     static final int numberLayers = 3;
-    static final int layerSizeX = 2;
-    static final int layerSizeY = 2;
-    static final int numberTargetCells = 1000;
-    static final int excitatoryWeight = 10;
-    static final int inhibitoryWeight = 10;
+    static final int layerSizeX = 5;
+    static final int layerSizeY = 5;
+    static final int numberTargetCells = 5000;
+    static final int excitatoryWeight = 5;
+    static final int inhibitoryWeight = 5;
 
     static int numCPUs;
     static int[] neuronsPerLayerArray = new int[numberLayers];
@@ -125,62 +125,112 @@ public class Main {
                         double theta=0;
                         int randomNeuronID;
                         double radialDistance;
-                        int totalNumberOfConnections=100;
-                        if(neuronArray[i].prebuiltClass.equals(INH)){totalNumberOfConnections = 80;}
+                        int totalNumberOfConnections=10;
+                        if(neuronArray[i].prebuiltClass.equals(INH)){totalNumberOfConnections = 8;}
                         int numberOfConnections = 0;
-                        while(numberOfConnections < totalNumberOfConnections) {
-                            if (j == 0) {
-                                randomNeuronID = randomInt(neuronArray.length-numberTargetCells);
-                                radialDistance = neuronArray[i].getRadialDistance(neuronArray[randomNeuronID]);
-                                // ***** LAYER 4 CONNECTIVITY *****
-                                if (neuronArray[i].prebuiltClass.equals(EXC)) {
-                                    if (neuronArray[randomNeuronID].getZ() == 3) {
-                                        if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
-                                            alpha = .0139;
-                                            theta = 207.7;
-                                        } else {
-                                            alpha = .0148;
-                                            theta = 191.8;
+                        boolean excitatory=false;
+                        if(j!=2) {
+                            while (numberOfConnections < totalNumberOfConnections) {
+                                if (j == 0) {
+                                    randomNeuronID = randomInt(neuronArray.length - numberTargetCells);
+                                    radialDistance = neuronArray[i].getRadialDistance(neuronArray[randomNeuronID]);
+                                    // ***** LAYER 4 CONNECTIVITY *****
+                                    if (neuronArray[i].prebuiltClass.equals(EXC)) {
+                                        excitatory = true;
+                                        if (neuronArray[randomNeuronID].getZ() == 3) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0139;
+                                                theta = 207.7;
+                                            } else {
+                                                alpha = .0148;
+                                                theta = 191.8;
+                                            }
                                         }
-                                    }
-                                    if (neuronArray[randomNeuronID].getZ() == 2) {
-                                        if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
-                                            alpha = .0174;
-                                            theta = 154.4;
-                                        } else {
-                                            alpha = .0197;
-                                            theta = 131.5;
+                                        if (neuronArray[randomNeuronID].getZ() == 2) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0174;
+                                                theta = 154.4;
+                                            } else {
+                                                alpha = .0197;
+                                                theta = 131.5;
+                                            }
                                         }
-                                    }
 
-                                }
-                                else{
-                                    if (neuronArray[randomNeuronID].getZ() == 3) {
-                                        if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
-                                            alpha = .0126;
-                                            theta = 237.5;
-                                        } else {
-                                            alpha = .0119;
-                                            theta = 256.4;
+                                    } else {
+                                        if (neuronArray[randomNeuronID].getZ() == 3) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0126;
+                                                theta = 237.5;
+                                            } else {
+                                                alpha = .0119;
+                                                theta = 256.4;
+                                            }
+                                        }
+                                    }
+                                    if (!(alpha == 0)) {
+                                        double probabilityOfConnection = Math.exp(-alpha * Math.pow(Math.pow(theta, 2) + Math.pow(radialDistance * 1000, 2), .5));
+                                        if (randomDouble(1) < probabilityOfConnection) {
+                                            neuronArray[i].addSynapse(new Synapse(randomNeuronID, excitatory, excitatory ? excitatoryWeight:inhibitoryWeight));
+                                            numberOfConnections++;
                                         }
                                     }
                                 }
-                                if(!(alpha==0)) {
-                                    double probabilityOfConnection = Math.exp(-alpha * Math.pow(Math.pow(theta, 2) + Math.pow(radialDistance*1000, 2), .5));
-                                    if (randomDouble(1) < probabilityOfConnection) {
-                                        neuronArray[i].addSynapse(new Synapse(randomNeuronID, true, excitatoryWeight));
-                                        numberOfConnections++;
+                                if (j == 1) {
+                                    // ***** LAYER 2/3 CONNECTIVITY *****
+                                    randomNeuronID = randomInt(neuronArray.length);
+                                    radialDistance = neuronArray[i].getRadialDistance(neuronArray[randomNeuronID]);
+                                    if (neuronArray[i].prebuiltClass.equals(EXC)) {
+                                        //TODO Fix this simplification:
+                                        // Paper bases excitatory connections in layer 2/3 off functional connectivity metrics,
+                                        // simplified by copying metrics found between layer 4 and 2/3
+                                        excitatory = true;
+                                        if (neuronArray[randomNeuronID].getZ() == 2) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0139;
+                                                theta = 207.7;
+                                            } else {
+                                                alpha = .0148;
+                                                theta = 191.8;
+                                            }
+                                        }
+                                        if (neuronArray[randomNeuronID].getZ() == 4) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0174;
+                                                theta = 154.4;
+                                            } else {
+                                                alpha = .0197;
+                                                theta = 131.5;
+                                            }
+                                        }
+                                        if (!(alpha == 0)) {
+                                            double probabilityOfConnection = Math.exp(-alpha * Math.pow(Math.pow(theta, 2) + Math.pow(radialDistance * 1000, 2), .5));
+                                            if (randomDouble(1) < probabilityOfConnection) {
+                                                neuronArray[i].addSynapse(new Synapse(randomNeuronID, excitatory, excitatory ? excitatoryWeight:inhibitoryWeight));
+                                                numberOfConnections++;
+                                            }
+                                        }
+                                    } else {
+                                        if (neuronArray[randomNeuronID].getZ() == 2) {
+                                            if (neuronArray[randomNeuronID].prebuiltClass.equals(EXC)) {
+                                                alpha = .0149;
+                                                theta = 189.5;
+                                            } else {
+                                                alpha = .0150;
+                                                theta = 188.61;
+                                            }
+                                            double probabilityOfConnection = Math.exp(-alpha * Math.pow(Math.pow(theta, 2) + Math.pow(radialDistance * 1000, 2), .5));
+                                            if (randomDouble(1) < probabilityOfConnection) {
+                                                neuronArray[i].addSynapse(new Synapse(randomNeuronID, excitatory, excitatory ? excitatoryWeight:inhibitoryWeight));
+                                                numberOfConnections++;
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            if (j == 1) {
-                                // ***** LAYER 2/3 CONNECTIVITY *****
-                                randomNeuronID = randomInt(neuronArray.length);
-                                radialDistance = neuronArray[i].getRadialDistance(neuronArray[randomNeuronID]);
                             }
                         }
                         break;
                     }
+                    previousLoopNeurons += neuronsPerLayerArray[j];
                 }
             }
             Instant finish = Instant.now();
