@@ -1,6 +1,7 @@
 package simulation.general;
 
 import java.util.List;
+import java.util.Random;
 
 public class General {
     public static void println(String toPrint){
@@ -24,5 +25,10 @@ public class General {
             returnSum = returnSum + i;
         }
         return returnSum;
+    }
+
+    public static double randomDouble(double mean, double stdDev){
+        Random r = new Random();
+        return mean + stdDev*r.nextGaussian();
     }
 }

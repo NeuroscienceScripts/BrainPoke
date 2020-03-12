@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static simulation.general.General.println;
-import static simulation.general.General.sumDoubleList;
+import static simulation.general.General.*;
 
 public class Network {
     int numberLayers = 0;
@@ -20,8 +19,8 @@ public class Network {
     /**
      * Used to generate a network with the given parameters.  After inputting all the parameters, return a Neuron[] network through Network.generateNetwork()
      * @param numberLayers = number of layers in the model
-     * @param layerSizeX = size (microns) in the x direction
-     * @param layerSizeY = size (microns) in the y direction
+     * @param layerSizeX = size (mm) in the x direction
+     * @param layerSizeY = size (mm) in the y direction
      * @param neuronsPerLayerArray = number of neurons in each layer
      * @param typesOfNeuronsPerLayerArray = Neuron with dimensions [layer][neuron].  For example layer 0 could have 3 neuron types defined by [0][0], [0][1], and [0][2]
      * @param percentOfNeuronsPerLayerArray = Percentage of the Neuron types defined in typesOfNeuronsPerLayerArray. Say 50 percent of layer 0 neurons are of the type defined by typesOfNeuronsArray[0][0]. percentOfNeuronsPerLayerArray[0][0] should equal.5
@@ -78,13 +77,16 @@ public class Network {
 
     public Neuron[] generateNetwork(){
         Neuron[] returnNetwork = new Neuron[General.sumIntegerList(this.neuronsPerLayer)];
-
+        int neuronID = 0;
 
         for (int k=0; k < numberLayers; k++) { // cycle through layers
             for(int i=0; i < neuronsPerLayer.get(k); i++){
                 for(int j=0; j<this.percentOfNeuronsPerLayerArray[k].size(); j++){
                     if(i< this.percentOfNeuronsPerLayerArray[k].get(j)*neuronsPerLayer.get(k)){
-                        returnNetwork[k] = new Neuron(this.typesOfNeuronsPerLayerArray[k].get(j).neuronType, new Location(ThreadLocalRandom.current().nextDouble(layerSizeX),ThreadLocalRandom.current().nextDouble(layerSizeY),this.typesOfNeuronsPerLayerArray[k].get(j).meanZ+ThreadLocalRandom.current().nextDouble(this.typesOfNeuronsPerLayerArray[k].get(j).stdDevZ)))
+                        returnNetwork[neuronID] = new Neuron(this.typesOfNeuronsPerLayerArray[k].get(j).neuronType, new Location(ThreadLocalRandom.current().nextDouble(layerSizeX),ThreadLocalRandom.current().nextDouble(layerSizeY),randomDouble(this.typesOfNeuronsPerLayerArray[k].get(j).meanZ,this.typesOfNeuronsPerLayerArray[k].get(j).stdDevZ)));
+                        println(returnNetwork[neuronID].location.x+","+returnNetwork[neuronID].location.y+","+returnNetwork[neuronID].location.z);
+                        neuronID++;
+                        break;
                     }
                 }
             }
