@@ -72,13 +72,24 @@ public class Main {
     }
 
     public static void runSimulation(){
-        for(int i = 0; i<timeSteps; i++) {
+        for(int i = 0; i<1; i++) {
+
             int count = 0;
             for(Electrode electrode: electrodeArray) {
                 if (timeSteps % electrode.frequency == 0) {
                     for (int neuronID : electrode.neuronsInRange) {
                         println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
+                        neuronArray[neuronID].changeVoltage(electrode.voltageAtNeurons.get(count));
+                        println(""+neuronArray[neuronID].getVoltage());
                         count++;
+                    }
+                }
+            }
+
+            for(Neuron neuron: neuronArray){
+                if(neuron.checkForSpike()){
+                    for(Synapse synapse: neuron.getSynapses()){
+                        neuronArray[synapse.neuronID].changeVoltage(synapse.getWeight());
                     }
                 }
             }

@@ -111,11 +111,11 @@ public class Neuron {
      * iterates through all synapses in which this Neuron is
      * the pre-synaptic neuron and calls Neuron.changeVoltage
      */
-    public boolean update(){
+    public boolean checkForSpike(){
         boolean spike = false;
         v = v + (1/hz)*(.04*(v*v)+5*v+140-u);
         u = u + (a*b*v - a*u);
-        println("Voltage: "+this.v);
+        //println("Voltage: "+this.v);
         if(this.v > this.vThreshold) {
            spike = true;
 
