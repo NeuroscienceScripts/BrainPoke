@@ -7,6 +7,7 @@ import java.util.List;
 
 import simulation.NetworkNeuron;
 import static simulation.Neuron.PrebuiltNeuron.*;
+import static simulation.general.General.print;
 import static simulation.general.General.println;
 
 public class Main {
@@ -37,21 +38,32 @@ public class Main {
         percentOfNeuronsPerLayerArray[0].add(.15);
 
         // *** Layer 2 ***
-        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(RS, 0.0, 0.0));
+        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(RS, 10.0, 0.0));
         percentOfNeuronsPerLayerArray[1].add(.85);
-        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(FS, 0.0, 0.0));
+        typesOfNeuronsPerLayerArray[1].add(new NetworkNeuron(FS, 10.0, 0.0));
         percentOfNeuronsPerLayerArray[1].add(.15);
 
         // *** Layer 3 ***
-        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(RS, 0.0, 0.0));
+        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(RS, 20.0, 0.0));
         percentOfNeuronsPerLayerArray[2].add(.85);
-        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(FS, 0.0, 0.0));
+        typesOfNeuronsPerLayerArray[2].add(new NetworkNeuron(FS, 20.0, 0.0));
         percentOfNeuronsPerLayerArray[2].add(.15);
 
 
         Network newNetwork = new Network(numberLayers, layerSizeX, layerSizeY, neuronsPerLayerArray, typesOfNeuronsPerLayerArray, percentOfNeuronsPerLayerArray);
+        Neuron[] neuronArray = newNetwork.generateNetwork();
 
+        println(" "+ neuronArray[0].getVoltage());
+        Electrode singleElectrode = new Electrode(50, 50, 10, 1, 1, 1, 0, neuronArray);
 
+        println("Neurons effected by electrode: ");
+        int newLineCounter = 0;
+        for(int neuronID: singleElectrode.neuronsInRange){
+            print(neuronID+", ");
+            if(newLineCounter % 10 == 0){
+                print("\n");
+            }
+        }
         /*Neuron[] neurons = new Neuron[numberNeurons];
         neurons[0] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
         neurons[1] = (new Neuron(Neuron.PrebuiltNeuron.RS, new Location(0, 0, 0)));
