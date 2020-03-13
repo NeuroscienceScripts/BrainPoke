@@ -92,6 +92,11 @@ public class Main {
         }catch(Exception e){
             println("Exception thrown when writing output");
         }
+
+        numberOfDifferentTargetCellsSpiked = 0;
+        for(int i=0; i<targetLayerSpikes.length; i++){
+            targetLayerSpikes[i] = 0;
+        }
     }
 
     public static void addOutputToFile(String textToAppend) throws IOException
