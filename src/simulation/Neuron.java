@@ -7,7 +7,7 @@ import static simulation.general.General.*;
 
 public class Neuron {
 
-    int hz = 10;
+    int hz = 100;
     double a = 0;
     double b = 0;
     double c = 0;

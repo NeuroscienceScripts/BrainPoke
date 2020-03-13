@@ -26,11 +26,11 @@ public class Main {
     static double electrodeCurrent = 1000;
     static double electrodeTimeOffset = 0;
 
-    static final int timeSteps = 200;
+    static final int timeSteps = 20000;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
     static final int layerSizeY = 5;
-    static final int numberTargetCells = 1000;
+    static final int numberTargetCells = 10000;
     static final int excitatoryWeight = 5;
     static final int inhibitoryWeight = 5;
 
@@ -129,37 +129,45 @@ public class Main {
         Instant start = Instant.now();
 
         addElectrodes();
-        runSimulation();
 
-        Instant finish = Instant.now();
-        println("Finished "+timeSteps+" timesteps in +"+Duration.between(start,finish).toSeconds()+" Seconds");
-        for(int spikes: targetLayerSpikes)
-            if(spikes>0) numberOfDifferentTargetCellsSpiked ++;
-        try{
-            addOutputToFile(neuronsEffectedByElectrode+","+electrodeX+","+electrodeY+","+electrodeZ+","+electrodeRadius+","+electrodeFrequency+","+electrodeCurrent+","+timeSteps+","+numberLayers+","+layerSizeX+","+layerSizeY+
-                    ","+numberTargetCells+","+excitatoryWeight+","+inhibitoryWeight+","+sumIntegerArray(targetLayerSpikes)+","+numberOfDifferentTargetCellsSpiked+","+numCPUs+","+Duration.between(start,finish).toSeconds());
-        }catch(Exception e){
-            println("Exception thrown when writing output");
+        if(neuronsEffectedByElectrode >0) {
+            runSimulation();
+
+            Instant finish = Instant.now();
+            println("Finished " + timeSteps + " timesteps in +" + Duration.between(start, finish).toSeconds() + " Seconds");
+            for (int spikes : targetLayerSpikes)
+                if (spikes > 0) numberOfDifferentTargetCellsSpiked++;
+            try {
+                addOutputToFile(neuronsEffectedByElectrode + "," + electrodeX + "," + electrodeY + "," + electrodeZ + "," + electrodeRadius + "," + electrodeFrequency + "," + electrodeCurrent + "," + timeSteps + "," + numberLayers + "," + layerSizeX + "," + layerSizeY +
+                        "," + numberTargetCells + "," + excitatoryWeight + "," + inhibitoryWeight + "," + sumIntegerArray(targetLayerSpikes) + "," + numberOfDifferentTargetCellsSpiked + "," + numCPUs + "," + Duration.between(start, finish).toSeconds());
+            } catch (Exception e) {
+                println("Exception thrown when writing output");
+            }
+
+            String allTargetCellOutputs = "";
+            for (int cellSpikes : targetLayerSpikes)
+                allTargetCellOutputs = (allTargetCellOutputs + cellSpikes + ",");
+
+            try {
+                addOutputToFile(allTargetCellOutputs);
+            } catch (Exception e) {
+                println("Exception thrown when writing output");
+            }
+
+            numberOfDifferentTargetCellsSpiked = 0;
+            for (int i = 0; i < targetLayerSpikes.length; i++) {
+                targetLayerSpikes[i] = 0;
+            }
+
+            resetNeurons();
+            System.gc();
+            try {
+                Thread.sleep(10000);
+            } catch (Exception e) {
+                println("Failed to sleep for garbage collection");
+            }
+
         }
-
-        String allTargetCellOutputs="";
-        for(int cellSpikes: targetLayerSpikes)
-            allTargetCellOutputs = (allTargetCellOutputs+cellSpikes+",");
-
-        try{
-            addOutputToFile(allTargetCellOutputs);
-        }catch(Exception e){
-            println("Exception thrown when writing output");
-        }
-
-        numberOfDifferentTargetCellsSpiked = 0;
-        for(int i=0; i<targetLayerSpikes.length; i++){
-            targetLayerSpikes[i] = 0;
-        }
-
-        resetNeurons();
-        System.gc();
-        try{Thread.sleep(10000);}catch(Exception e){println("Failed to sleep for garbage collection");}
     }
 
     public static void addOutputToFile(String textToAppend) throws IOException
