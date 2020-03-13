@@ -16,14 +16,14 @@ import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.*;
 
 public class Main {
-    static final boolean silentMode = false;
+    static final boolean silentMode = true;
     //  *** ELECTRODE VARIABLES TO CHANGE ***
-    static double electrodeX = 1;
-    static double electrodeY = 1;
-    static double electrodeZ = 1;
+    static double electrodeX = 2.5;
+    static double electrodeY = 2.5;
+    static double electrodeZ = 0;
     static double electrodeRadius = .1;
     static double electrodeFrequency = 5;
-    static double electrodeCurrent = 500;
+    static double electrodeCurrent = 1000;
     static double electrodeTimeOffset = 0;
 
     static final int timeSteps = 2000;
@@ -48,9 +48,9 @@ public class Main {
         println("Cores detected: "+Runtime.getRuntime().availableProcessors());
         numCPUs = Runtime.getRuntime().availableProcessors();
         createNetwork();
-        addSynapses();
+        //addSynapses();
 
-        // ** Electrode current = 500
+        // ** Electrode current = 1000
         mainLoop();
 
         electrodeFrequency = 20;
