@@ -426,7 +426,7 @@ public class Main {
                 println("Started updating neurons: "+startNeuron+"-"+endNeuron);
             for (int currentNeuron = startNeuron; currentNeuron <= endNeuron; currentNeuron++) {
                 if(neuronArray[currentNeuron].checkForSpike()){
-                    if(currentNeuron > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)
+                    if(currentNeuron > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells-1)
                         targetLayerSpikes[currentNeuron-(sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)]++;
                     for(Synapse synapse: neuronArray[currentNeuron].getSynapses()){
                         neuronArray[synapse.neuronID].changeVoltage(synapse.getWeight());
