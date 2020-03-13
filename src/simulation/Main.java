@@ -379,11 +379,7 @@ public class Main {
 
         public void run() {
             for (int electrodeNeuronID = startNeuron; electrodeNeuronID <= endNeuron; electrodeNeuronID++) {
-                if(!silentMode)
-                    println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
                 neuronArray[electrode.neuronsInRange.get(electrodeNeuronID)].changeVoltage(electrode.voltageAtNeurons.get(electrodeNeuronID));
-                if(!silentMode)
-                    println(""+neuronArray[neuronID].getVoltage());
                 latch.countDown();
             }
         }
