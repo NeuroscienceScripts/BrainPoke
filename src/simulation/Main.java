@@ -343,7 +343,8 @@ public class Main {
     public static void updateElectrodes(){
         for(Electrode electrode: electrodeArray) {
             if (currentTimeStep % electrode.frequency == 0) {
-                println("Electrode pulse...");
+                if(!silentMode)
+                    println("Electrode pulse...");
                 Instant start = Instant.now();
                 int numBatches = electrode.neuronsInRange.size()/numCPUs;
                 CountDownLatch latch = new CountDownLatch(numBatches);
@@ -359,7 +360,8 @@ public class Main {
                 }
 
                 Instant finish = Instant.now();
-                println("Finished electrode pulse in " + Duration.between(start, finish).toSeconds() + " Seconds");
+                if(!silentMode)
+                    println("Finished electrode pulse in " + Duration.between(start, finish).toSeconds() + " Seconds");
             }
         }
     }
