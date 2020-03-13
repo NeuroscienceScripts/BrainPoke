@@ -386,7 +386,8 @@ public class Main {
     }
 
     public static void updateNeurons(){
-        println("Updating Neurons for timestep: "+currentTimeStep);
+        if(!silentMode)
+            println("Updating Neurons for timestep: "+currentTimeStep);
         Instant start = Instant.now();
         int numBatches = 100;
         CountDownLatch latch = new CountDownLatch(numBatches);
@@ -402,7 +403,8 @@ public class Main {
         }
 
         Instant finish = Instant.now();
-        println("Finished updating neurons in "+Duration.between(start,finish).toSeconds()+" Seconds");
+        if(!silentMode)
+            println("Finished updating neurons in "+Duration.between(start,finish).toSeconds()+" Seconds");
     }
 
     static class NeuronUpdate implements Runnable{
