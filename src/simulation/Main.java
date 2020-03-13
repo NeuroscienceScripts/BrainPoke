@@ -17,15 +17,15 @@ public class Main {
     static final double electrodeY = 1;
     static final double electrodeZ = 1;
     static final double electrodeRadius = .1;
-    static final double electrodeFrequency = 1;
+    static final double electrodeFrequency = 5;
     static final double electrodeCurrent = 500;
     static final double electrodeTimeOffset = 0;
 
-    static final int timeSteps = 200;
+    static final int timeSteps = 2000;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
     static final int layerSizeY = 5;
-    static final int numberTargetCells = 5000;
+    static final int numberTargetCells = 10000;
     static final int excitatoryWeight = 5;
     static final int inhibitoryWeight = 5;
 
@@ -34,8 +34,11 @@ public class Main {
     static ArrayList<Electrode> electrodeArray = new ArrayList<>();
     static int[] targetLayerSpikes = new int[numberTargetCells];
     static Neuron[] neuronArray;
+    static int currentTimeStep;
 
     public static void main(String[] args) {
+        Instant start = Instant.now();
+
         println("Cores detected: "+Runtime.getRuntime().availableProcessors());
         numCPUs = Runtime.getRuntime().availableProcessors();
 
@@ -43,6 +46,9 @@ public class Main {
         addSynapses();
         addElectrodes();
         runSimulation();
+
+        Instant finish = Instant.now();
+        println("Finished "+timeSteps+" timesteps in +"+Duration.between(start,finish).toSeconds()+" Seconds");
 
     }
 
@@ -125,8 +131,8 @@ public class Main {
                         double theta=0;
                         int randomNeuronID;
                         double radialDistance;
-                        int totalNumberOfConnections=10;
-                        if(neuronArray[i].prebuiltClass.equals(INH)){totalNumberOfConnections = 8;}
+                        int totalNumberOfConnections=100;
+                        if(neuronArray[i].prebuiltClass.equals(INH)){totalNumberOfConnections = 80;}
                         int numberOfConnections = 0;
                         boolean excitatory=false;
                         if(j!=2) {
@@ -245,33 +251,9 @@ public class Main {
     }
 
     public static void runSimulation(){
-        for(int i = 0; i<timeSteps; i++) {
-
-            int count = 0;
-            for(Electrode electrode: electrodeArray) {
-                if (timeSteps % electrode.frequency == 0) {
-                    for (int neuronID : electrode.neuronsInRange) {
-                        //println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
-                        neuronArray[neuronID].changeVoltage(electrode.voltageAtNeurons.get(count));
-                        //println(""+neuronArray[neuronID].getVoltage());
-                        count++;
-                    }
-                }
-            }
-
-            count = 0;
-            for(Neuron neuron: neuronArray){
-                if(neuron.checkForSpike()){
-                    if(count > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)
-                        targetLayerSpikes[count-(sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)]++;
-                    for(Synapse synapse: neuron.getSynapses()){
-                        neuronArray[synapse.neuronID].changeVoltage(synapse.getWeight());
-                    }
-                }
-                count++;
-            }
-
-
+        for(currentTimeStep = 0; currentTimeStep < timeSteps; currentTimeStep++) {
+            updateElectrodes();
+            updateNeurons();
         }
 
         int numberOfTargetCellsFired = 0;
@@ -282,4 +264,101 @@ public class Main {
         println("Number of target layer spikes: "+ sumIntegerArray(targetLayerSpikes));
         println("Number of different cells that have fired: "+numberOfTargetCellsFired);
     }
-}
+
+    public static void updateElectrodes(){
+        for(Electrode electrode: electrodeArray) {
+            if (currentTimeStep % electrode.frequency == 0) {
+                println("Electrode pulse...");
+                Instant start = Instant.now();
+                int numBatches = electrode.neuronsInRange.size()/numCPUs;
+                CountDownLatch latch = new CountDownLatch(numBatches);
+                ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
+                for (int i = 0; i < numBatches; i++) {
+                    taskExecutor.submit(new ElectrodeBatch(latch, electrode, i * electrode.neuronsInRange.size() / numBatches, ((i + 1) * electrode.neuronsInRange.size() / numBatches) - 1));
+                }
+
+                try {
+                    latch.await();
+                } catch (InterruptedException E) {
+                    println("Interrupted thread during Electrode Pulse");
+                }
+
+                Instant finish = Instant.now();
+                println("Finished electrode pulse in " + Duration.between(start, finish).toSeconds() + " Seconds");
+            }
+        }
+    }
+
+    static class ElectrodeBatch implements Runnable {
+        private CountDownLatch latch;
+        private Electrode electrode;
+        private int startNeuron;
+        private int endNeuron;
+
+        public ElectrodeBatch(CountDownLatch latch, Electrode electrode, int startNeuron, int endNeuron){
+            this.latch = latch;
+            this.electrode = electrode;
+            this.startNeuron = startNeuron;
+            this.endNeuron = endNeuron;
+        }
+
+        public void run() {
+            for (int electrodeNeuronID = startNeuron; electrodeNeuronID <= endNeuron; electrodeNeuronID++) {
+                //println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
+                neuronArray[electrode.neuronsInRange.get(electrodeNeuronID)].changeVoltage(electrode.voltageAtNeurons.get(electrodeNeuronID));
+                //println(""+neuronArray[neuronID].getVoltage());
+                latch.countDown();
+            }
+        }
+    }
+
+    public static void updateNeurons(){
+        println("Updating Neurons for timestep: "+currentTimeStep);
+        Instant start = Instant.now();
+        int numBatches = 100;
+        CountDownLatch latch = new CountDownLatch(numBatches);
+        ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
+        for(int i=0; i<numBatches; i++) {
+            taskExecutor.submit(new NeuronUpdate(latch, i*neuronArray.length/numBatches, ((i+1)*neuronArray.length/numBatches)-1));
+        }
+
+        try {
+            latch.await();
+        } catch (InterruptedException E) {
+            println("Interrupted thread during neuron update");
+        }
+
+        Instant finish = Instant.now();
+        println("Finished updating neurons in "+Duration.between(start,finish).toSeconds()+" Seconds");
+    }
+
+    static class NeuronUpdate implements Runnable{
+        private CountDownLatch latch;
+        private int startNeuron;
+        private int endNeuron;
+
+        public NeuronUpdate(CountDownLatch latch, int startNeuron, int endNeuron){
+            this.latch = latch;
+            this.startNeuron = startNeuron;
+            this.endNeuron = endNeuron;
+        }
+
+        public void run(){
+            Instant start = Instant.now();
+            println("Started updating neurons: "+startNeuron+"-"+endNeuron);
+            for (int currentNeuron = startNeuron; currentNeuron <= endNeuron; currentNeuron++) {
+                if(neuronArray[currentNeuron].checkForSpike()){
+                    if(currentNeuron > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)
+                        targetLayerSpikes[currentNeuron-(sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)]++;
+                    for(Synapse synapse: neuronArray[currentNeuron].getSynapses()){
+                        neuronArray[synapse.neuronID].changeVoltage(synapse.getWeight());
+                    }
+                }
+            }
+            Instant finish = Instant.now();
+            println("Finished updating neurons: "+startNeuron+"-"+endNeuron+" in "+ Duration.between(start,finish).toSeconds()+" Seconds");
+            latch.countDown();
+        }
+    }
+
+    }

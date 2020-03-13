@@ -77,42 +77,42 @@ public class Electrode {
     }
 
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return maximum possible x value to apply voltage to
      */
     public double getMaxX(){
         return this.locationX + (this.current / 4*pi*sigma*.01);
     }
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return minimum possible x value to apply voltage to
      */
     public double getMinX(){
         return this.locationX - (this.current / 4*pi*sigma*.01);
     }
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return maximum possible y value to apply voltage to
      */
     public double getMaxY(){
         return this.locationY + (this.current / 4*pi*sigma*.01);
     }
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return minimum possible y value to apply voltage to
      */
     public double getMinY(){
         return this.locationY - (this.current / 4*pi*sigma*.01);
     }
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return maximum possible z value to apply voltage to
      */
     public double getMaxZ(){
         return this.locationZ + (this.current / 4*pi*sigma*.01);
     }
     /**
-     * Used to optimize simulation, cuts off voltage at <.1mV
+     * Used to optimize simulation, cuts off voltage at <.01mV
      * @return minimum possible z value to apply voltage to
      */
     public double getMinZ(){
