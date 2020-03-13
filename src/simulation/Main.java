@@ -42,7 +42,7 @@ public class Main {
     static int numberOfDifferentTargetCellsSpiked=0;
     static Neuron[] neuronArray;
     static int currentTimeStep;
-    private static File filePath;
+    static int neuronsEffectedByElectrode =0;
 
     public static void main(String[] args) {
         println("Cores detected: "+Runtime.getRuntime().availableProcessors());
@@ -104,7 +104,7 @@ public class Main {
         for(int spikes: targetLayerSpikes)
             if(spikes>0) numberOfDifferentTargetCellsSpiked ++;
         try{
-            addOutputToFile(electrodeX+","+electrodeY+","+electrodeZ+","+electrodeRadius+","+electrodeFrequency+","+electrodeCurrent+","+timeSteps+","+numberLayers+","+layerSizeX+","+layerSizeY+
+            addOutputToFile(neuronsEffectedByElectrode+","+electrodeX+","+electrodeY+","+electrodeZ+","+electrodeRadius+","+electrodeFrequency+","+electrodeCurrent+","+timeSteps+","+numberLayers+","+layerSizeX+","+layerSizeY+
                     ","+numberTargetCells+","+excitatoryWeight+","+inhibitoryWeight+","+sumIntegerArray(targetLayerSpikes)+","+numberOfDifferentTargetCellsSpiked+","+numCPUs+","+Duration.between(start,finish).toSeconds());
         }catch(Exception e){
             println("Exception thrown when writing output");
@@ -338,6 +338,7 @@ public class Main {
     public static void addElectrodes(){
         Electrode singleElectrode = new Electrode(electrodeX, electrodeY, electrodeZ, electrodeRadius, electrodeFrequency, electrodeCurrent, electrodeTimeOffset, neuronArray);
         electrodeArray[0]=singleElectrode;
+        neuronsEffectedByElectrode = singleElectrode.neuronsInRange.size();
         System.gc();
         try{Thread.sleep(10000);}catch(Exception e){println("Failed to sleep for garbage collection");}
     }
@@ -409,7 +410,7 @@ public class Main {
         if(!silentMode)
             println("Updating Neurons for timestep: "+currentTimeStep);
         Instant start = Instant.now();
-        int numBatches = (numberTargetCells/10)>(numCPUs*2) ? numberTargetCells/10 : numCPUs;
+        int numBatches = numCPUs;
         CountDownLatch latch = new CountDownLatch(numBatches);
         ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
         int previousLayerNeurons = 0;
