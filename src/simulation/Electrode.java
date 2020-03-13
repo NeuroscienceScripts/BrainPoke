@@ -48,6 +48,7 @@ public class Electrode {
             }
             neuronID++;
         }
+        println("Neurons effected by electrode: "+neuronsInRange.size());
     }
 
     public List<Integer> getNeuronsInRange(){
