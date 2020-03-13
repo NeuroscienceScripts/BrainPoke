@@ -84,7 +84,7 @@ public class Network {
                 for(int j=0; j<this.percentOfNeuronsPerLayerArray[k].size(); j++){
                     if(i< this.percentOfNeuronsPerLayerArray[k].get(j)*neuronsPerLayer.get(k)){
                         returnNetwork[neuronID] = new Neuron(this.typesOfNeuronsPerLayerArray[k].get(j).neuronType, new Location(ThreadLocalRandom.current().nextDouble(layerSizeX),ThreadLocalRandom.current().nextDouble(layerSizeY),randomDouble(this.typesOfNeuronsPerLayerArray[k].get(j).meanZ,this.typesOfNeuronsPerLayerArray[k].get(j).stdDevZ)));
-                        //println(returnNetwork[neuronID].location.x+","+returnNetwork[neuronID].location.y+","+returnNetwork[neuronID].location.z);
+                        println(returnNetwork[neuronID].location.x+","+returnNetwork[neuronID].location.y+","+returnNetwork[neuronID].location.z);
                         neuronID++;
                         break;
                     }

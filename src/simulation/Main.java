@@ -26,7 +26,7 @@ public class Main {
     static double electrodeCurrent = 1000;
     static double electrodeTimeOffset = 0;
 
-    static final int timeSteps = 2000;
+    static final int timeSteps = 200;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
     static final int layerSizeY = 5;
@@ -48,7 +48,7 @@ public class Main {
         println("Cores detected: "+Runtime.getRuntime().availableProcessors());
         numCPUs = Runtime.getRuntime().availableProcessors();
         createNetwork();
-        //addSynapses();
+        addSynapses();
 
         // ** Electrode current = 1000
         mainLoop();
@@ -63,8 +63,9 @@ public class Main {
         electrodeFrequency = 20;
         mainLoop();
 
-        // ** Electrode current = 100
-        electrodeCurrent = 100;
+        // ** Electrode current = 750
+        electrodeZ=0;
+        electrodeCurrent = 750;
         mainLoop();
 
         electrodeFrequency = 20;
@@ -77,8 +78,39 @@ public class Main {
         electrodeFrequency = 20;
         mainLoop();
 
-        // ** Electrode current = 25
-        electrodeCurrent = 25;
+        // ** Electrode current = 500
+        electrodeZ=0;
+        electrodeCurrent = 500;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        electrodeZ=3;
+        electrodeFrequency = 5;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        // ** Electrode current = 250
+        electrodeZ=0;
+        electrodeCurrent = 250;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        electrodeZ=3;
+        electrodeFrequency = 5;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        // ** Electrode current = 125
+        electrodeZ=0;
+        electrodeCurrent = 125;
         mainLoop();
 
         electrodeFrequency = 20;
