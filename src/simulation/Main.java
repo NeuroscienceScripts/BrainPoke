@@ -36,7 +36,8 @@ public class Main {
 
     static int numCPUs;
     static int[] neuronsPerLayerArray = new int[numberLayers];
-    static ArrayList<Electrode> electrodeArray = new ArrayList<>();
+    //static ArrayList<Electrode> electrodeArray = new ArrayList<>(); //TODO change to an array list for multiple electrodes...
+    static Electrode[] electrodeArray = new Electrode[1];
     static int[] targetLayerSpikes = new int[numberTargetCells];
     static int numberOfDifferentTargetCellsSpiked=0;
     static Neuron[] neuronArray;
@@ -80,7 +81,6 @@ public class Main {
 
     public static void mainLoop(){
         Instant start = Instant.now();
-
 
         addElectrodes();
         runSimulation();
@@ -321,7 +321,7 @@ public class Main {
 
     public static void addElectrodes(){
         Electrode singleElectrode = new Electrode(electrodeX, electrodeY, electrodeZ, electrodeRadius, electrodeFrequency, electrodeCurrent, electrodeTimeOffset, neuronArray);
-        electrodeArray.add(singleElectrode);
+        electrodeArray[0]=singleElectrode;
     }
 
     public static void runSimulation(){
