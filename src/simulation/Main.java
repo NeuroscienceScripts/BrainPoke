@@ -16,7 +16,7 @@ import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.*;
 
 public class Main {
-    static final boolean silentMode = true;
+    static final boolean silentMode = false;
     //  *** ELECTRODE VARIABLES TO CHANGE ***
     static double electrodeX = 1;
     static double electrodeY = 1;
@@ -28,9 +28,9 @@ public class Main {
 
     static final int timeSteps = 2000;
     static final int numberLayers = 3;
-    static final int layerSizeX = 2;
-    static final int layerSizeY = 2;
-    static final int numberTargetCells = 100;
+    static final int layerSizeX = 5;
+    static final int layerSizeY = 5;
+    static final int numberTargetCells = 1000;
     static final int excitatoryWeight = 5;
     static final int inhibitoryWeight = 5;
 
@@ -65,6 +65,20 @@ public class Main {
 
         // ** Electrode current = 100
         electrodeCurrent = 100;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        electrodeZ=3;
+        electrodeFrequency = 5;
+        mainLoop();
+
+        electrodeFrequency = 20;
+        mainLoop();
+
+        // ** Electrode current = 25
+        electrodeCurrent = 25;
         mainLoop();
 
         electrodeFrequency = 20;
@@ -112,6 +126,8 @@ public class Main {
         }
 
         resetNeurons();
+        System.gc();
+        try{Thread.sleep(10000);}catch(Exception e){println("Failed to sleep for garbage collection");}
     }
 
     public static void addOutputToFile(String textToAppend) throws IOException
@@ -164,7 +180,7 @@ public class Main {
     public static void addSynapses(){
         println("Adding Synapses...");
         Instant start = Instant.now();
-        int numBatches = 100;
+        int numBatches = (numberTargetCells/10)>(numCPUs*2) ? numberTargetCells/10 : numCPUs;
         CountDownLatch latch = new CountDownLatch(numBatches);
         ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
         for(int i=0; i<numBatches; i++) {
@@ -322,6 +338,8 @@ public class Main {
     public static void addElectrodes(){
         Electrode singleElectrode = new Electrode(electrodeX, electrodeY, electrodeZ, electrodeRadius, electrodeFrequency, electrodeCurrent, electrodeTimeOffset, neuronArray);
         electrodeArray[0]=singleElectrode;
+        System.gc();
+        try{Thread.sleep(10000);}catch(Exception e){println("Failed to sleep for garbage collection");}
     }
 
     public static void runSimulation(){
@@ -346,7 +364,7 @@ public class Main {
                 if(!silentMode)
                     println("Electrode pulse...");
                 Instant start = Instant.now();
-                int numBatches = electrode.neuronsInRange.size()/numCPUs;
+                int numBatches = numCPUs;
                 CountDownLatch latch = new CountDownLatch(numBatches);
                 ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
                 for (int i = 0; i < numBatches; i++) {
@@ -382,8 +400,8 @@ public class Main {
         public void run() {
             for (int electrodeNeuronID = startNeuron; electrodeNeuronID <= endNeuron; electrodeNeuronID++) {
                 neuronArray[electrode.neuronsInRange.get(electrodeNeuronID)].changeVoltage(electrode.voltageAtNeurons.get(electrodeNeuronID));
-                latch.countDown();
             }
+            latch.countDown();
         }
     }
 
@@ -391,11 +409,15 @@ public class Main {
         if(!silentMode)
             println("Updating Neurons for timestep: "+currentTimeStep);
         Instant start = Instant.now();
-        int numBatches = 100;
+        int numBatches = (numberTargetCells/10)>(numCPUs*2) ? numberTargetCells/10 : numCPUs;
         CountDownLatch latch = new CountDownLatch(numBatches);
         ExecutorService taskExecutor = Executors.newFixedThreadPool(numCPUs);
-        for(int i=0; i<numBatches; i++) {
-            taskExecutor.submit(new NeuronUpdate(latch, i*neuronArray.length/numBatches, ((i+1)*neuronArray.length/numBatches)-1));
+        int previousLayerNeurons = 0;
+        for(int j=0; j<numberLayers; j++){
+            for(int i=0; i<numBatches; i++) {
+                taskExecutor.submit(new NeuronUpdate(latch, (i*neuronsPerLayerArray[j]/numBatches+previousLayerNeurons), (((i+1)*neuronsPerLayerArray[j]/numBatches)-1)+previousLayerNeurons));
+            }
+            previousLayerNeurons += neuronsPerLayerArray[j];
         }
 
         try {
