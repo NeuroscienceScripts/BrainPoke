@@ -16,6 +16,7 @@ import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.*;
 
 public class Main {
+    static final boolean silentMode = true;
     //  *** ELECTRODE VARIABLES TO CHANGE ***
     static double electrodeX = 1;
     static double electrodeY = 1;
@@ -27,9 +28,9 @@ public class Main {
 
     static final int timeSteps = 2000;
     static final int numberLayers = 3;
-    static final int layerSizeX = 5;
-    static final int layerSizeY = 5;
-    static final int numberTargetCells = 10000;
+    static final int layerSizeX = 2;
+    static final int layerSizeY = 2;
+    static final int numberTargetCells = 100;
     static final int excitatoryWeight = 5;
     static final int inhibitoryWeight = 5;
 
@@ -43,6 +44,11 @@ public class Main {
     private static File filePath;
 
     public static void main(String[] args) {
+        println("Cores detected: "+Runtime.getRuntime().availableProcessors());
+        numCPUs = Runtime.getRuntime().availableProcessors();
+        createNetwork();
+        addSynapses();
+
         // ** Electrode current = 500
         mainLoop();
 
@@ -75,10 +81,7 @@ public class Main {
     public static void mainLoop(){
         Instant start = Instant.now();
 
-        println("Cores detected: "+Runtime.getRuntime().availableProcessors());
-        numCPUs = Runtime.getRuntime().availableProcessors();
-        createNetwork();
-        addSynapses();
+
         addElectrodes();
         runSimulation();
 
@@ -93,10 +96,22 @@ public class Main {
             println("Exception thrown when writing output");
         }
 
+        String allTargetCellOutputs="";
+        for(int cellSpikes: targetLayerSpikes)
+            allTargetCellOutputs = (allTargetCellOutputs+cellSpikes+",");
+
+        try{
+            addOutputToFile(allTargetCellOutputs);
+        }catch(Exception e){
+            println("Exception thrown when writing output");
+        }
+
         numberOfDifferentTargetCellsSpiked = 0;
         for(int i=0; i<targetLayerSpikes.length; i++){
             targetLayerSpikes[i] = 0;
         }
+
+        resetNeurons();
     }
 
     public static void addOutputToFile(String textToAppend) throws IOException
@@ -179,7 +194,8 @@ public class Main {
 
         public void run(){
             Instant start = Instant.now();
-            //println("Started synapsing neurons: "+startNeuron+"-"+endNeuron);
+            if(!silentMode)
+                println("Started synapsing neurons: "+startNeuron+"-"+endNeuron);
             for(int i=startNeuron; i<=endNeuron; i++){
                 int previousLoopNeurons=0;
                 for(int j=0; j<neuronsPerLayerArray.length; j++){ //TODO implement parameter lists for synapsing other layers... Update for total distance?
@@ -297,7 +313,8 @@ public class Main {
                 }
             }
             Instant finish = Instant.now();
-            //println("Finished synapsing neurons: "+startNeuron+"-"+endNeuron+" in "+ Duration.between(start,finish).toSeconds()+" Seconds");
+            if(!silentMode)
+                println("Finished synapsing neurons: "+startNeuron+"-"+endNeuron+" in "+ Duration.between(start,finish).toSeconds()+" Seconds");
             latch.countDown();
         }
     }
@@ -362,9 +379,11 @@ public class Main {
 
         public void run() {
             for (int electrodeNeuronID = startNeuron; electrodeNeuronID <= endNeuron; electrodeNeuronID++) {
-                //println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
+                if(!silentMode)
+                    println(neuronID + ": " + electrode.voltageAtNeurons.get(count));
                 neuronArray[electrode.neuronsInRange.get(electrodeNeuronID)].changeVoltage(electrode.voltageAtNeurons.get(electrodeNeuronID));
-                //println(""+neuronArray[neuronID].getVoltage());
+                if(!silentMode)
+                    println(""+neuronArray[neuronID].getVoltage());
                 latch.countDown();
             }
         }
@@ -403,7 +422,8 @@ public class Main {
 
         public void run(){
             Instant start = Instant.now();
-            //println("Started updating neurons: "+startNeuron+"-"+endNeuron);
+            if(!silentMode)
+                println("Started updating neurons: "+startNeuron+"-"+endNeuron);
             for (int currentNeuron = startNeuron; currentNeuron <= endNeuron; currentNeuron++) {
                 if(neuronArray[currentNeuron].checkForSpike()){
                     if(currentNeuron > sumIntegerArray(neuronsPerLayerArray)-numberTargetCells)
@@ -414,9 +434,16 @@ public class Main {
                 }
             }
             Instant finish = Instant.now();
-            //println("Finished updating neurons: "+startNeuron+"-"+endNeuron+" in "+ Duration.between(start,finish).toSeconds()+" Seconds");
+            if(!silentMode)
+                println("Finished updating neurons: "+startNeuron+"-"+endNeuron+" in "+ Duration.between(start,finish).toSeconds()+" Seconds");
             latch.countDown();
         }
     }
 
+    public static void resetNeurons(){
+        for(Neuron neuron: neuronArray){
+            neuron.resetNeuron();
+        }
     }
+
+}

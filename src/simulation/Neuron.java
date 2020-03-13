@@ -13,7 +13,9 @@ public class Neuron {
     double c = 0;
     double d = 0;
     double v = 0;
+    double vReset = 0;
     double u = 0;
+    double uReset = 0;
     double vThreshold = 30;
     double probabilityOfSynapseHorizontal = 0;
     double probabilityOfSynapseVertical = 0;
@@ -76,6 +78,8 @@ public class Neuron {
                 println("ERROR - Predefined Neuron not found");
                 break;
         }
+        this.vReset = this.v;
+        this.uReset = this.u;
     }
 
     /**
@@ -171,6 +175,11 @@ public class Neuron {
         double yDistance = this.location.y - targetNeuron.location.y;
 
         return Math.pow(Math.pow(xDistance,2)+Math.pow(yDistance,2),.5);
+    }
+
+    public void resetNeuron(){
+        this.v = this.vReset;
+        this.u = this.uReset;
     }
 
 }
