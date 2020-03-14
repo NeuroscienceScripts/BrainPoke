@@ -26,11 +26,11 @@ public class Main {
     static double electrodeCurrent = 1000;
     static double electrodeTimeOffset = 0;
 
-    static final int timeSteps = 20000;
+    static final int timeSteps = 2;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
     static final int layerSizeY = 5;
-    static final int numberTargetCells = 10000;
+    static final int numberTargetCells = 100;
     static final int excitatoryWeight = 5;
     static final int inhibitoryWeight = 5;
 
@@ -226,7 +226,7 @@ public class Main {
         for(int i=0; i<numBatches; i++) {
             taskExecutor.submit(new SynapseBatch(latch, i*neuronArray.length/numBatches, ((i+1)*neuronArray.length/numBatches)-1));
         }
-
+        taskExecutor.shutdown();
         try {
             latch.await();
         } catch (InterruptedException E) {
@@ -412,6 +412,7 @@ public class Main {
                     taskExecutor.submit(new ElectrodeBatch(latch, electrode, i * electrode.neuronsInRange.size() / numBatches, ((i + 1) * electrode.neuronsInRange.size() / numBatches) - 1));
                 }
 
+                taskExecutor.shutdown();
                 try {
                     latch.await();
                 } catch (InterruptedException E) {
@@ -460,7 +461,7 @@ public class Main {
             }
             previousLayerNeurons += neuronsPerLayerArray[j];
         }
-
+        taskExecutor.shutdown();
         try {
             latch.await();
         } catch (InterruptedException E) {
