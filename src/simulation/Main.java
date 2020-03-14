@@ -1,7 +1,8 @@
+//TODO Add Java-docs for all classes/functions
+
 package simulation;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Duration;
@@ -26,13 +27,13 @@ public class Main {
     static double electrodeCurrent = 1000;
     static double electrodeTimeOffset = 0;
 
-    static final int timeSteps = 2;
+    static final int timeSteps = 3000;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
     static final int layerSizeY = 5;
-    static final int numberTargetCells = 100;
-    static final int excitatoryWeight = 5;
-    static final int inhibitoryWeight = 5;
+    static final int numberTargetCells = 10000;
+    static final double excitatoryWeight = .5;
+    static final double inhibitoryWeight = .5;
 
     static int numCPUs;
     static int[] neuronsPerLayerArray = new int[numberLayers];
@@ -43,8 +44,12 @@ public class Main {
     static Neuron[] neuronArray;
     static int currentTimeStep;
     static int neuronsEffectedByElectrode =0;
+    static int numSimulations = 0;
 
     public static void main(String[] args) {
+        try{addOutputToFile("Starting Simulations...  *New Network Created*");}catch(Exception e){println("Failed to addOutputToFile");}
+
+        Instant start = Instant.now();
         println("Cores detected: "+Runtime.getRuntime().availableProcessors());
         numCPUs = Runtime.getRuntime().availableProcessors();
         createNetwork();
@@ -123,6 +128,8 @@ public class Main {
         electrodeFrequency = 20;
         mainLoop();
 
+        Instant finish = Instant.now();
+        try{addOutputToFile("Handled "+numSimulations+" in "+Duration.between(start,finish).toSeconds()+" seconds");}catch(Exception e){println("Failed to addOutputToFile");}
     }
 
     public static void mainLoop(){
@@ -131,6 +138,7 @@ public class Main {
         addElectrodes();
 
         if(neuronsEffectedByElectrode >0) {
+            numSimulations++;
             runSimulation();
 
             Instant finish = Instant.now();
