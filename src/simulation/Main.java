@@ -17,16 +17,19 @@ import static simulation.Neuron.PrebuiltNeuron.*;
 import static simulation.general.General.*;
 
 public class Main {
-    static final boolean silentMode = true;
-    //  *** ELECTRODE VARIABLES TO CHANGE ***
-    static double electrodeX = 2.5;
-    static double electrodeY = 2.5;
-    static double electrodeZ = 0;
-    static double electrodeRadius = .1;
-    static double electrodeFrequency = 5;
-    static double electrodeCurrent = 1000;
-    static double electrodeTimeOffset = 0;
+    static final boolean silentMode = true; // Silents output for each timestep/synapse/etc
 
+    //  *** ELECTRODE VARIABLES TO CHANGE ***
+    static int numElectrodes = 2;
+    static double[] electrodeX = {0, 5};
+    static double[] electrodeY =  {0, 5};
+    static double[] electrodeZ =  {0, 0};
+    static double[] electrodeRadius =  {.1, .1};
+    static double[] electrodeFrequency =  {20, 20};
+    static double[] electrodeCurrent =  {1000, 1000};
+    static double[] electrodeTimeOffset =  {0, 0};
+
+    // *** Simulation Variables to Change ***
     static final int timeSteps = 3000;
     static final int numberLayers = 3;
     static final int layerSizeX = 5;
@@ -35,16 +38,18 @@ public class Main {
     static final double excitatoryWeight = .5;
     static final double inhibitoryWeight = .5;
 
+    // *** Program sets/changes these variables ***
     static int numCPUs;
     static int[] neuronsPerLayerArray = new int[numberLayers];
     //static ArrayList<Electrode> electrodeArray = new ArrayList<>(); //TODO change to an array list for multiple electrodes...
-    static Electrode[] electrodeArray = new Electrode[1];
+    static Electrode[] electrodeArray = new Electrode[2];
+    static int[] neuronsEffectedByElectrode = new int[electrodeArray.length];
     static int[] targetLayerSpikes = new int[numberTargetCells];
     static int numberOfDifferentTargetCellsSpiked=0;
     static Neuron[] neuronArray;
     static int currentTimeStep;
-    static int neuronsEffectedByElectrode =0;
     static int numSimulations = 0;
+
 
     public static void main(String[] args) {
         try{addOutputToFile("Starting Simulations...  *New Network Created*");}catch(Exception e){println("Failed to addOutputToFile");}
@@ -58,74 +63,164 @@ public class Main {
         // ** Electrode current = 1000
         mainLoop();
 
-        electrodeFrequency = 20;
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
         mainLoop();
 
-        electrodeZ=3;
-        electrodeFrequency = 5;
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
-        electrodeFrequency = 20;
+        //Set to layer 4
+        electrodeZ[0] = 3;
+        electrodeZ[1] = 3;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
+        mainLoop();
+
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
+        mainLoop();
+
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
         // ** Electrode current = 750
-        electrodeZ=0;
-        electrodeCurrent = 750;
+        electrodeZ[0] = 0;
+        electrodeZ[1] = 0;
+        electrodeCurrent[0] = 750;
+        electrodeCurrent[1] = 750;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
         mainLoop();
 
-        electrodeFrequency = 20;
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
         mainLoop();
 
-        electrodeZ=3;
-        electrodeFrequency = 5;
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
-        electrodeFrequency = 20;
+        // Set to layer 4
+        electrodeZ[0] = 3;
+        electrodeZ[1] = 3;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
+        mainLoop();
+
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
+        mainLoop();
+
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
         // ** Electrode current = 500
-        electrodeZ=0;
-        electrodeCurrent = 500;
+        electrodeZ[0] = 0;
+        electrodeZ[1] = 0;
+        electrodeCurrent[0] = 500;
+        electrodeCurrent[1] = 500;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
         mainLoop();
 
-        electrodeFrequency = 20;
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
         mainLoop();
 
-        electrodeZ=3;
-        electrodeFrequency = 5;
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
-        electrodeFrequency = 20;
+        // Set to layer 4
+        electrodeZ[0] = 3;
+        electrodeZ[1] = 3;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
+        mainLoop();
+
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
+        mainLoop();
+
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
         // ** Electrode current = 250
-        electrodeZ=0;
-        electrodeCurrent = 250;
+        electrodeZ[0] = 0;
+        electrodeZ[1] = 0;
+        electrodeCurrent[0] = 250;
+        electrodeCurrent[1] = 250;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
         mainLoop();
 
-        electrodeFrequency = 20;
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
         mainLoop();
 
-        electrodeZ=3;
-        electrodeFrequency = 5;
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
-        electrodeFrequency = 20;
+        // Set to layer 4
+        electrodeZ[0] = 3;
+        electrodeZ[1] = 3;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
+        mainLoop();
+
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
+        mainLoop();
+
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
         // ** Electrode current = 125
-        electrodeZ=0;
-        electrodeCurrent = 125;
+        electrodeZ[0] = 0;
+        electrodeZ[1] = 0;
+        electrodeCurrent[0] = 125;
+        electrodeCurrent[1] = 125;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
         mainLoop();
 
-        electrodeFrequency = 20;
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
         mainLoop();
 
-        electrodeZ=3;
-        electrodeFrequency = 5;
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
-        electrodeFrequency = 20;
+        // Set to layer 4
+        electrodeZ[0] = 3;
+        electrodeZ[1] = 3;
+
+        electrodeFrequency[0] = 20;
+        electrodeFrequency[1] = 20;
+        mainLoop();
+
+        electrodeFrequency[0] = 5;
+        electrodeFrequency[1] = 5;
+        mainLoop();
+
+        electrodeFrequency[0] = 1;
+        electrodeFrequency[1] = 1;
         mainLoop();
 
         Instant finish = Instant.now();
@@ -137,7 +232,7 @@ public class Main {
 
         addElectrodes();
 
-        if(neuronsEffectedByElectrode >0) {
+        if(sumIntegerArray(neuronsEffectedByElectrode) >0) {
             numSimulations++;
             runSimulation();
 
@@ -146,7 +241,7 @@ public class Main {
             for (int spikes : targetLayerSpikes)
                 if (spikes > 0) numberOfDifferentTargetCellsSpiked++;
             try {
-                addOutputToFile(neuronsEffectedByElectrode + "," + electrodeX + "," + electrodeY + "," + electrodeZ + "," + electrodeRadius + "," + electrodeFrequency + "," + electrodeCurrent + "," + timeSteps + "," + numberLayers + "," + layerSizeX + "," + layerSizeY +
+                addOutputToFile(sumIntegerArray(neuronsEffectedByElectrode) + "," + electrodeX + "," + electrodeY + "," + electrodeZ + "," + electrodeRadius + "," + electrodeFrequency + "," + electrodeCurrent + "," + timeSteps + "," + numberLayers + "," + layerSizeX + "," + layerSizeY +
                         "," + numberTargetCells + "," + excitatoryWeight + "," + inhibitoryWeight + "," + sumIntegerArray(targetLayerSpikes) + "," + numberOfDifferentTargetCellsSpiked + "," + numCPUs + "," + Duration.between(start, finish).toSeconds());
             } catch (Exception e) {
                 println("Exception thrown when writing output");
@@ -384,11 +479,18 @@ public class Main {
     }
 
     public static void addElectrodes(){
-        Electrode singleElectrode = new Electrode(electrodeX, electrodeY, electrodeZ, electrodeRadius, electrodeFrequency, electrodeCurrent, electrodeTimeOffset, neuronArray);
-        electrodeArray[0]=singleElectrode;
-        neuronsEffectedByElectrode = singleElectrode.neuronsInRange.size();
-        System.gc();
-        try{Thread.sleep(10000);}catch(Exception e){println("Failed to sleep for garbage collection");}
+        for(int i=0; i < numElectrodes; i++) {
+            Electrode singleElectrode = new Electrode(electrodeX[i], electrodeY[i], electrodeZ[i], electrodeRadius[i], electrodeFrequency[i], electrodeCurrent[i], electrodeTimeOffset[i], neuronArray);
+            electrodeArray[i] = singleElectrode;
+            neuronsEffectedByElectrode[i] = singleElectrode.neuronsInRange.size();
+            System.gc();
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                println("Failed to sleep for garbage collection");
+            }
+        }
+
     }
 
     public static void runSimulation(){
